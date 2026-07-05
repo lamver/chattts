@@ -1,13 +1,19 @@
 services:
   chattts-ui:
-    image: jianchang512/chattts-ui:latest
+    build:
+      context: https://github.com
+      dockerfile: Dockerfile
     container_name: chattts-ui
     #ports:
     #  - "9966:9966"
     volumes:
-      - ./data:/app/data
-      - ./models:/root/.cache/huggingface
+      - chattts-data:/app/data
+      - chattts-models:/root/.cache/huggingface
     environment:
       - WEB_ADDRESS=0.0.0.0:9966
       - CHATTTS_REUSE=1
     restart: always
+
+volumes:
+  chattts-data:
+  chattts-models:
