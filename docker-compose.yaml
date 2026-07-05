@@ -1,32 +1,20 @@
 services:
   xtts-api-server:
-    build:
-      context: .
-      dockerfile_inline: |
-        FROM python:3.10-slim
-        WORKDIR /app
-        RUN apt-get update && apt-get install -y --no-install-recommends \
-            git \
-            curl \
-            ffmpeg \
-            build-essential \
-            && rm -rf /var/lib/apt/lists/*
-        RUN pip install --no-cache-dir torch --index-url https://pytorch.org
-        RUN pip install --no-cache-dir xtts-api-server
-        EXPOSE 8020
-        ENV HOST=0.0.0.0
-        ENV PORT=8020
-        ENV DEVS=cpu
-        # Добавляем флаг --hs для принудительного запуска веб-интерфейса (Share/Dashboard)
-        CMD ["python", "-m", "xtts_api_server", "--hs"]
+    image: daswer123/xtts-api-server:latest
     container_name: xtts-api-server
     ports:
       - "8020:8020"
     volumes:
-      - xtts-models:/app/models
-      - xtts-speakers:/app/speakers
+      - ./xtts_models:/app/models
+      - ./xtts_speakers:/app/speakers
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8020
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     restart: always
-
-volumes:
-  xtts-models:
-  xtts-speakers:

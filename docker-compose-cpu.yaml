@@ -1,19 +1,32 @@
 services:
-  chattts-ui:
+  xtts-api-server:
     build:
-      context: https://github.com
-      dockerfile: Dockerfile
-    container_name: chattts-ui
-    #ports:
-    #  - "9966:9966"
+      context: .
+      dockerfile_inline: |
+        FROM python:3.10-slim
+        WORKDIR /app
+        RUN apt-get update && apt-get install -y --no-install-recommends \
+            git \
+            curl \
+            ffmpeg \
+            build-essential \
+            && rm -rf /var/lib/apt/lists/*
+        RUN pip install --no-cache-dir torch --index-url https://pytorch.org
+        RUN pip install --no-cache-dir xtts-api-server
+        EXPOSE 8020
+        ENV HOST=0.0.0.0
+        ENV PORT=8020
+        ENV DEVS=cpu
+        # Добавляем флаг --hs для принудительного запуска веб-интерфейса (Share/Dashboard)
+        CMD ["python", "-m", "xtts_api_server", "--hs"]
+    container_name: xtts-api-server
+    ports:
+      - "8020:8020"
     volumes:
-      - chattts-data:/app/data
-      - chattts-models:/root/.cache/huggingface
-    environment:
-      - WEB_ADDRESS=0.0.0.0:9966
-      - CHATTTS_REUSE=1
+      - xtts-models:/app/models
+      - xtts-speakers:/app/speakers
     restart: always
 
 volumes:
-  chattts-data:
-  chattts-models:
+  xtts-models:
+  xtts-speakers:
