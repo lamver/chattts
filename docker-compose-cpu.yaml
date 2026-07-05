@@ -1,0 +1,13 @@
+services:
+  chattts-ui:
+    image: jianchang512/chattts-ui:latest
+    container_name: chattts-ui
+    #ports:
+    #  - "9966:9966"
+    volumes:
+      - ./data:/app/data
+      - ./models:/root/.cache/huggingface
+    environment:
+      - WEB_ADDRESS=0.0.0.0:9966
+      - CHATTTS_REUSE=1
+    restart: always
